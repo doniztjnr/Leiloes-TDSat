@@ -9,6 +9,7 @@
  */
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,7 +19,8 @@ public class ProdutosDAO {
 
     Connection conn;
     PreparedStatement prep;
-    ResultSet resultset;
+    Statement stmt;
+    ResultSet rs;
     ArrayList<ProdutosDTO> listagem = new ArrayList<>();
 
     public void cadastrarProduto(ProdutosDTO produto) throws SQLException {
@@ -43,8 +45,30 @@ public class ProdutosDAO {
 
     }
 
-    public ArrayList<ProdutosDTO> listarProdutos() {
+    public ArrayList<ProdutosDTO> listarProdutos() throws SQLException {
 
+        String SQL_SELECT = "SELECT id, nome, valor, status FROM produtos";
+        
+        try {
+            conn = new conectaDAO().connectDB();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(SQL_SELECT);
+            
+            while ( rs.next() ) {
+                ProdutosDTO produtosDTO = new ProdutosDTO();
+                produtosDTO.setId(rs.getInt("id"));
+                produtosDTO.setNome(rs.getString("nome"));
+                produtosDTO.setValor(rs.getFloat("valor"));
+                produtosDTO.setStatus(rs.getString("status"));
+                listagem.add(produtosDTO);
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            rs.close();
+            stmt.close();
+            conn.close();
+        }
         return listagem;
     }
 
