@@ -48,13 +48,13 @@ public class ProdutosDAO {
     public ArrayList<ProdutosDTO> listarProdutos() throws SQLException {
 
         String SQL_SELECT = "SELECT id, nome, valor, status FROM produtos";
-        
+
         try {
             conn = new conectaDAO().connectDB();
             stmt = conn.createStatement();
             rs = stmt.executeQuery(SQL_SELECT);
-            
-            while ( rs.next() ) {
+
+            while (rs.next()) {
                 ProdutosDTO produtosDTO = new ProdutosDTO();
                 produtosDTO.setId(rs.getInt("id"));
                 produtosDTO.setNome(rs.getString("nome"));
@@ -72,4 +72,21 @@ public class ProdutosDAO {
         return listagem;
     }
 
+    public void venderProduto(int idDaVenda) throws SQLException {
+        String SQL_UPDATE = "UPDATE produtos SET status = 'Vendido' WHERE id = ?";
+
+        try {
+            conn = new conectaDAO().connectDB();
+            prep = conn.prepareStatement(SQL_UPDATE);
+
+            prep.setInt(1, idDaVenda);
+
+            prep.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            prep.close();
+            conn.close();
+        }
+    }
 }
